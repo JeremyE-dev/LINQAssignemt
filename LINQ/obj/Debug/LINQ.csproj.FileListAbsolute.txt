@@ -6,3 +6,10 @@ C:\Users\Jeremy\source\repos\LINQExercises\LINQ\bin\Debug\LINQ.pdb
 C:\Users\Jeremy\source\repos\LINQExercises\LINQ\obj\Debug\LINQ.csprojAssemblyReference.cache
 C:\Users\Jeremy\source\repos\LINQExercises\LINQ\obj\Debug\LINQ.exe
 C:\Users\Jeremy\source\repos\LINQExercises\LINQ\obj\Debug\LINQ.pdb
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\bin\Debug\Customers.xml
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\bin\Debug\LINQ.exe.config
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\bin\Debug\LINQ.exe
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\bin\Debug\LINQ.pdb
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\obj\Debug\LINQ.csprojAssemblyReference.cache
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\obj\Debug\LINQ.exe
+C:\Users\Jeremy\source\repos\LINQAssignment\LINQ\obj\Debug\LINQ.pdb

@@ -35,14 +35,14 @@ namespace LINQ
             //Exercise21();
             //Exercise22();
             //Exercise23();
-            //Exercise24(); // check these  24 and 25 with Ishwar ex condiments showing up in each of these
+            //Exercise24(); 
             //Exercise25(); 
             //Exercise26();
             //Exercise27();
-            //Exercise28(); // could I do for each loop for count via LINQ syntax - ask Ishwar
-            //Exercise29(); // could I do for each loop for sum via LINQ syntax - ask Ishwar
+            //Exercise28(); 
+            //Exercise29();
             //Exercise30();
-            //Exercise31(); // categories not ordered by average price and top 3 not taken
+            Exercise31(); 
 
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
@@ -110,74 +110,6 @@ namespace LINQ
             }
         }
         #endregion
-
-        //Ishwar - skip this wa sjust pr5acvtice to get familiar with LINQ
-        static void LINQPractice1()
-        {
-            // method syntax notes
-            var products = DataLoader.LoadProducts();
-            //get average of unit price
-
-            //create a decimal called average and set it equal to
-            //the products collection Average of each products unit price
-            //// Linq qill loop through the collection one product at a time take each products unit price and calculate teh average
-            ///
-
-            //scalar methods
-            decimal average = products.Average(p => p.UnitPrice);
-
-            Console.WriteLine("The average Unit Price is: {0:c}", average);
-            Console.WriteLine("The max Unit Price is {0:c}", products.Max(p => p.UnitPrice));
-            Console.WriteLine("The min Unit Price is {0:c}", products.Min(p => p.UnitPrice));
-            Console.WriteLine("The number of products is {0}", products.Count());
-
-            //next set or queries returns an IEnumerable
-
-            // list of products less than $20
-            //Where filters a collection based on an expression
-            // set alias: p => 
-            //set expression (i.e. condition) if its true will be included in list if not, it will not be included
-            // print descending by unit price
-            //take top 5
-            var lessThan20 = DataLoader.LoadProducts().Where(p => p.UnitPrice < 20).OrderByDescending(p => p.UnitPrice).Take(5);
-
-            Console.WriteLine("==================================================");
-            foreach (var item in lessThan20)
-            {
-                Console.WriteLine("Product: {0} Unit Price {1:c}", item.ProductName, item.UnitPrice);
-            }
-
-            //groupby -- group by product category
-            // group by region
-
-            //groups does not retutn IEnuerable directly - returns IGrouping
-            //group will have a key ( "computer SCience" and a value "students in Computer SCience"
-
-            var groups = DataLoader.LoadProducts().Where(g => g.UnitPrice < 20).OrderByDescending(g => g.UnitPrice).GroupBy(p => p.Category);
-            //need two loops one for category, one for products in the category
-
-
-
-            foreach (var group in groups)
-            {
-                Console.WriteLine("Category: {0}", group.Key);
-                Console.WriteLine("------------------------------------------------------------");
-                foreach (var product in group)
-                {
-                    Console.WriteLine("Product Name: {0}, Unit Price {1:c}", product.ProductName, product.UnitPrice);
-
-                }
-
-            }
-
-        }
-
-
-
-
-
-
-
 
 
         /// <summary>
@@ -663,15 +595,19 @@ namespace LINQ
         static void Exercise25()
         {
             var products = DataLoader.LoadProducts();
-            var productsOutOfStock = from p in products
-                                     where p.UnitsInStock >= 1
-                                     group p by p.Category;
+          
+            var ProductCategoryGroups = from c in products
+                                       group c by c.Category
+                                       into p
+                                       where p.All(o => o.UnitsInStock > 0)
+                                       select p.Key;
 
-            foreach (var item in productsOutOfStock)
+            foreach (var item in ProductCategoryGroups)
             {
-                Console.WriteLine(item.Key);
-
+                Console.WriteLine(item);
             }
+
+
         }
 
         /// <summary>
@@ -720,28 +656,14 @@ namespace LINQ
         {
             var products = DataLoader.LoadProducts();
 
-            //List of products by category
-
+            
             var groups = from p in products
                          group p by p.Category;
             
-            foreach (var group in groups) //each group is a category (i.e meats)
+            foreach (var group in groups) 
             {
-                Console.WriteLine(group.Key + ": "); //prints name of each category
-
-               
-                List<string> ProductNames = new List<string>();
-                
-                // could I do this loop through LINQ syntax?
-                foreach( var item in group)
-                {
-                    ProductNames.Add(item.ProductName);
-                }
-
-                int productCount = ProductNames.Count();
-
-                Console.WriteLine("Product count: {0}", productCount);
-                Console.WriteLine();
+                Console.WriteLine("Product Category: {0} Number of Products: {1}", group.Key, group.Count()); 
+     
             }
 
 
@@ -757,25 +679,14 @@ namespace LINQ
             //List of products by category
 
             var groups = from p in products
-                         group p by p.Category;
-
-
+                         group p by p.Category
+                         into g
+                         select new { totalInStock = g.Sum(x => x.UnitsInStock),
+                         inStockCategory = g.Key};
 
             foreach (var group in groups) //each group is a category (i.e meats)
             {
-                Console.WriteLine(group.Key + ": "); //prints name of each category
-
-
-
-                List<int> stockCount = new List<int>();
-
-                foreach (var item in group)
-                {
-                    stockCount.Add(item.UnitsInStock);
-                }
-
-                int totalItemsInStock = stockCount.Sum();
-                Console.WriteLine("Items in Stock: {0}", totalItemsInStock);
+                Console.WriteLine("Category: {0} Total in stock: {1}", group.inStockCategory, group.totalInStock);
 
             }
 
@@ -807,9 +718,7 @@ namespace LINQ
                     Console.WriteLine("{0}{1:c}",item.ProductName, item.UnitPrice);
                     Console.WriteLine();
                 }      
-                  
-
-               
+                         
             }
         }
 
@@ -824,32 +733,23 @@ namespace LINQ
 
             var products = DataLoader.LoadProducts();
 
+            var aveProductPrice = from p in products
+                                  group p by new
+                                  {
+                                      p.Category
 
-            var categoryGroup = from product in products
-                                group product by product.Category;
+                                  } into q
+                                  select new
+                                  {
+                                      Average = q.Average(r => r.UnitPrice),
+                                      q.Key.Category
+                                  };
+            var topThree = aveProductPrice.OrderByDescending(x => x.Average).Take(3);
 
-
-            foreach (var category in categoryGroup) //group is a category
+            foreach (var item in topThree)
             {
-                Console.WriteLine(category.Key); //print t6hr name of the category
-                Console.WriteLine("-----------------------------------------------------");
-
-                decimal average = category.Average(x => x.UnitPrice);//get the average unit price for the category
-
-                var categoryWithAverage = (from g in category select new { category = g.Category, averageUnitPrice = average }).OrderBy(x => x.averageUnitPrice).Take(1);
-
-                var result = from c in categoryWithAverage.OrderBy(x => x.averageUnitPrice) select c;
-
-
-                foreach (var item in result)
-                {
-
-                    Console.WriteLine("Average Unit Price: {0:c}", item.averageUnitPrice);
-                    Console.WriteLine();
-                }
-            }
-
-         
+                Console.WriteLine("Category: {0}  Average Unit Price: {1:c}", item.Category, item.Average);
+            } 
         }
     }
 }
